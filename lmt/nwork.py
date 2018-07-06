@@ -1,6 +1,7 @@
 from . import shared
 from .models import db
 from .models import WifiAPModel
+from .models import WifiSTAModel
 
 class Network:
     def __init__(self):
@@ -124,3 +125,51 @@ class WifiAP(Network):
         WifiAPModel.update(row, **fields)
         self.db.close()
         self.start()
+
+class WifiSTA(Network):
+    def __init__(self):
+        super().__init__()
+        self.log.debug("wifista: Start constructor")
+        self.db.connect()
+        row = WifiSTAModel.row()
+        if row:
+            for k, v in row.items():
+                if k != "created_at":
+                    setattr(self, k, v)
+        else:
+            self.log.debug("wifista: create table")
+            WifiSTAModel.init()
+        self.db.close()
+    
+    def connect(self):
+        pass
+    
+    def disconnect(self):
+        pass
+    
+    def scan(self):
+        import network
+        nic = network.WLAN(network.STA_IF)
+        nic.active(True)
+        wifilist = nic.scan()
+        nic.active(False)
+        wifiaplist = []
+        wifisec = ['Open','WEP','WPA-PSK','WPA2-PSK','WPA/WPA2-PSK']
+        wifihide = ['Visible','Hidden']
+        for wifi in wifilist:
+            wifi_info = {
+                "ssid":    str(wifi[0], 'utf8'),
+                "channel":    str(wifi[2]),
+                "strength":    str(wifi[3]),
+                "security":    wifisec[wifi[4]],
+                "hidden":    wifihide[wifi[5]],
+            }
+            wifiaplist.append(wifi_info)
+        wifi_ap = sorted(wifiaplist, key=lambda k: (k['ssid'],k['strength']))
+        return wifi_ap
+    
+    def save(self):
+        pass
+    
+    def info(self):
+        pass
