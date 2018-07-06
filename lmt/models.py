@@ -76,7 +76,6 @@ class BaseModel(filedb.Model):
         print("update:", where[pkey_field])
         with open(cls.fname(where[pkey_field])) as f:
             data = ujson.loads(f.read())
-        print(fields)
         for k in fields.keys():
             if not k.startswith('__'):
                 if k not in data.keys():
