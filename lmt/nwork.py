@@ -124,7 +124,7 @@ class WifiAP(Network):
         fields = {k: v for k, v in self.__dict__.items()}
         WifiAPModel.update(row, **fields)
         self.db.close()
-        self.start()
+        return True
 
 class WifiSTA(Network):
     def __init__(self):
@@ -138,38 +138,89 @@ class WifiSTA(Network):
                     setattr(self, k, v)
         else:
             self.log.debug("wifista: create table")
-            WifiSTAModel.init()
         self.db.close()
     
-    def connect(self):
-        pass
+    def connect(self, ssid, key):
+        import network
+        nic = network.WLAN(network.STA_IF)
+        nic.active(True)
+        nic.connect(ssid, key)
+        import utime
+        start = self.board.time
+        while not nic.isconnected():
+            # wait 1sec
+            utime.sleep(1)
+            now = self.board.time
+            if now > start+30:
+                break
+        if nic.isconnected():
+            self.ip = nic.ifconfig()[0]
+            self.mask = nic.ifconfig()[1]
+            self.gateway = nic.ifconfig()[2]
+            self.dns = nic.ifconfig()[3]
+            self.ssid = ssid
+            self.password = key
+            row = WifiSTAModel.row()
+            if row:
+                self.update()
+            else:
+                self.save()
+            return True
+        else:
+            nic.disconnect()
+            return False
     
     def disconnect(self):
-        pass
+        import network
+        nic = network.WLAN(network.STA_IF)
+        nic.disconnect()
+        nic.active(False)
+        return True
     
     def scan(self):
         import network
         nic = network.WLAN(network.STA_IF)
         nic.active(True)
-        wifilist = nic.scan()
+        stations = nic.scan()
         nic.active(False)
-        wifiaplist = []
-        wifisec = ['Open','WEP','WPA-PSK','WPA2-PSK','WPA/WPA2-PSK']
-        wifihide = ['Visible','Hidden']
-        for wifi in wifilist:
-            wifi_info = {
-                "ssid":    str(wifi[0], 'utf8'),
-                "channel":    str(wifi[2]),
-                "strength":    str(wifi[3]),
-                "security":    wifisec[wifi[4]],
-                "hidden":    wifihide[wifi[5]],
+        wifis = [] # stations
+        security_types = ['Open','WEP','WPA-PSK','WPA2-PSK','WPA/WPA2-PSK']
+        shows = ['Visible','Hidden']
+        for w in stations:
+            wifi_data = {
+                "ssid":    str(w[0], 'utf8'),
+                "channel":    str(w[2]),
+                "signal":    str(w[3]),
+                "security":    security_types[w[4]],
+                "hidden":    shows[w[5]],
             }
-            wifiaplist.append(wifi_info)
-        wifi_ap = sorted(wifiaplist, key=lambda k: (k['ssid'],k['strength']))
-        return wifi_ap
+            wifis.append(wifi_data)
+        # sorted by signal
+        _aps = sorted(wifis, key=lambda k: (k['ssid'],k['signal']))
+        return _aps
     
+    def update(self):
+        self.db.connect()
+        row = WifiSTAModel.row()
+        fields = {k: v for k, v in self.__dict__.items()}
+        WifiSTAModel.update(row, **fields)
+        self.db.close()
+        return True
+
     def save(self):
-        pass
+        self.db.connect()
+        row = WifiSTAModel.row()
+        if row:
+            return row
+        else:
+            WifiSTAModel.init()    
+        fields = {k: v for k, v in self.__dict__.items()}
+        row = WifiSTAModel.save(**fields)
+        self.db.close()
+        return row
     
     def info(self):
-        pass
+        self.db.connect()
+        row = WifiSTAModel.row()
+        self.db.close()
+        return row
