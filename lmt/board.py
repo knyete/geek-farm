@@ -14,6 +14,11 @@ class Board:
     def id(self):
         return self.__id
     
+    @property
+    def time(self):
+        import utime
+        return utime.mktime(utime.localtime())
+    
     def get_platform(self):
         import sys
         return sys.platform
