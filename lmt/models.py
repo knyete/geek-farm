@@ -41,20 +41,30 @@ class BaseModel(filedb.Model):
     
     @classmethod
     def save(cls, **kwargs):
+        # This is a great shit, please better this!
         pkey_field = cls.__fields__[0]
         pkey_type = cls.__schema__[pkey_field]
+        keys = cls.__schema__.keys()
+        data = {}
+        for k in kwargs.keys():
+            if k in keys:
+                data[k] = kwargs[k]
+            elif k.startswith('__'):
+                key = k.replace('__', '')
+                if key in keys:
+                    data[key] = kwargs[k]
         for k, v in cls.__schema__.items():
-            if k not in kwargs:
+            if k not in data:
                 default = v
                 if callable(default):
                     default = default()
-                kwargs[k] = default
+                data[k] = default
 
-        pkey = kwargs[pkey_field]
+        pkey = data[pkey_field]
         with open(cls.fname(pkey), "w") as f:
-            f.write(ujson.dumps(kwargs))
+            f.write(ujson.dumps(data))
         shared._log.info("model: create pkey: %s" % pkey)
-        return kwargs
+        return data
     
     @classmethod
     def rows(cls):
