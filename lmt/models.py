@@ -114,3 +114,19 @@ class WifiAPModel(BaseModel):
     ])
     __fields__ = list(__schema__.keys())
 
+class WifiSTAModel(BaseModel):
+    __table__ = "wifist"
+    __schema__ = OrderedDict([
+        ("created_at", str(int(utime.time()))),
+        ("channel", 0),
+        ("hidden", False),
+        ("authmode", 0),
+        ("ssid", "geekgarden"),
+        ("password", ""),
+        ("hostname", ""),
+        ("ip", ""),
+        ("mask", ""),
+        ("gateway", ""),
+        ("dns", ""),
+    ])
+    __fields__ = list(__schema__.keys())
