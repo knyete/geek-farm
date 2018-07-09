@@ -18,6 +18,7 @@ def led(pin, on=True):
 
 def get_time():
     """Return localtime."""
+    config.LOG.info("utils:Get current time.")
     if platform() == "linux":
         return get_time_linux()
     elif platform() == "esp8266":
@@ -37,6 +38,7 @@ def get_time_esp():
 
 def connect_wifi(ssid, key):
     """Connect Wifi."""
+    config.LOG.info("utils:Connecting to: %s" % ssid)
     if platform() == "linux":
         return connect_wifi_linux(ssid, key)
     elif platform() == "esp8266":
@@ -65,16 +67,19 @@ def connect_wifi_esp(ssid, key):
             break
     if nic.isconnected():
         # led on
+        config.LOG.info("utils:Connected to: %s" % ssid)
         led(config.L_ST_WIFI, True)
         return True
     else:
         nic.disconnect()
         # led of
+        config.LOG.error("utils:Failed connecting to: %s" % ssid)
         led(config.L_ST_WIFI, False)
         return False
 
 def is_first_time():
     """Is first time."""
+    config.LOG.debug("utils:Checing if is first time.")
     for data in models.WelcomeModel.scan():
         if data:
             return data
@@ -83,6 +88,7 @@ def is_first_time():
 
 def wifi_scan():
     """Wifi scan AP."""
+    config.LOG.debug("utils:Scan wifi access points.")
     if platform() == "linux":
         return wifi_scan_linux()
     elif platform() == "esp8266":
@@ -133,15 +139,18 @@ def wifi_scan_esp():
 
 def platform():
     """return platform"""
+    config.LOG.debug("utils:Get platform.")
     import sys
     return sys.platform
 
 def version():
     """return version"""
+    config.LOG.debug("utils:Get version.")
     return "0.0.1"
 
 def get_info():
-    """return infomations."""
+    """return informations."""
+    config.LOG.info("utils:Get info.")
     return {
         'platform': platform(),
         'version': version()
