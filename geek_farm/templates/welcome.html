@@ -1,0 +1,39 @@
+{% args stations %}
+<div style="text-align: center">
+    <img src="/static/img/logo.png" width="200">
+</div>
+<form name="frmselect" method="post">
+    <table cellpadding='4' border='1' frame='box' rules='all'>
+        <TR>
+            <TD>Select SSID: <select name='ssid'>
+            {% for wifi in stations %}
+            <option value="{{wifi['ssid']}}">{{wifi['ssid']}}</option>
+            {% endfor %}
+            </select>
+        <TR>
+            <TD>Enter Password for Secured SSID: <input type='password' name='key' maxlength='30' value=''>
+        <TR>
+            <input class="button link" type='submit' value='Conectar'>
+    </table>
+</form>
+<BR>
+<B><U>Available SSID's:</U></B>
+<BR>
+<table cellpadding='4' border='1' frame='box' rules='all'>
+    <TR>
+    <TH>SSID
+    <TH>Channel
+    <TH>Strength
+    <TH>Security
+    <TH>Visible
+    </TR>
+    {% for wifi in stations %}
+        <TR>
+            <TD>{{wifi['ssid']}}</TD>
+            <TD>{{wifi['channel']}}</TD>
+            <TD>{{wifi['signal']}} db</TD>
+            <TD>{{wifi['security']}}</TD>
+            <TD>{{wifi['hidden']}}</TD>
+        </TR>
+    {% endfor %}
+</table>
