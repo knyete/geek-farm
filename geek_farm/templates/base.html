@@ -9,4 +9,12 @@
   <body>
     Platform: {{info['platform']}}
     Version: {{info['version']}}
+    {% if info['network'] %}
+    IP: {{ info['network']['ip'] }}
+    GATEWAY: {{ info['network']['gateway'] }}
+    DNS: {{ info['network']['dns'] }}
+    SSID: {{ info['network']['ssid'] }}
+    CHANNEL: {{ info['network']['channel'] }}
+     | <a href="/disconnect">Disconnect</a>
+    {% endif %}
  

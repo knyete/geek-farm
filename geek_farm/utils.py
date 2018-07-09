@@ -3,6 +3,17 @@
 from geek_farm import models
 from geek_farm import config
 
+def disconnect():
+    if platform() == "linux":
+        return True
+    import network
+    nic = network.WLAN(network.STA_IF)
+    if not nic.active():
+        return True
+    if nic.isconnected():
+        nic.disconnect()
+    return True
+    
 def led(pin, on=True):
     """led."""
     if platform() == "linux":
@@ -137,6 +148,44 @@ def wifi_scan_esp():
     _aps = sorted(wifis, key=lambda k: (k['ssid'],k['signal']))
     return _aps
 
+def get_wifi_info_linux():
+    """return wifi info."""
+    return {
+        'ip': '192.168.0.2',
+        'gateway': '192.168.0.1',
+        'dns': '8.8.8.8',
+        'ssid': 'test',
+        'channel': 1
+    }
+
+def get_wifi_info_esp():
+    """return wifi info."""
+    import network
+    nic = network.WLAN(network.STA_IF)
+    if not nic.active():
+        return None
+    if nic.isconnected():
+        return {
+            'ip': nic.ifconfig()[0],
+            'gateway': nic.ifconfig()[2],
+            'dns': nic.ifconfig()[3],
+            'ssid': 'get db',
+            'channel': 11
+        }
+    else:
+        return None
+
+
+def get_wifi_info():
+    """return wifi info."""
+    config.LOG.info("utils:Getting wifi info.")
+    if platform() == "linux":
+        return get_wifi_info_linux()
+    elif platform() == "esp8266":
+        return get_wifi_info_esp()
+    else:
+        return None
+
 def platform():
     """return platform"""
     config.LOG.debug("utils:Get platform.")
@@ -153,5 +202,6 @@ def get_info():
     config.LOG.info("utils:Get info.")
     return {
         'platform': platform(),
-        'version': version()
+        'version': version(),
+        'network': get_wifi_info()
     }
