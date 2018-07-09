@@ -1,0 +1,3 @@
+include geek_farm/static/js/*
+include geek_farm/static/css/*
+include geek_farm/static/img/*
