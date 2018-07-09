@@ -112,3 +112,5 @@ venv.bak/
 mpy
 lib
 *.db
+*_html.py
+R.py
