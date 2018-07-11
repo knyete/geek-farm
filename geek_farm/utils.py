@@ -9,9 +9,11 @@ def disconnect():
     import network
     nic = network.WLAN(network.STA_IF)
     if not nic.active():
+        led(config.L_ST_WIFI, False)
         return True
     if nic.isconnected():
         nic.disconnect()
+        led(config.L_ST_WIFI, False)
     return True
     
 def led(pin, on=True):
