@@ -30,7 +30,7 @@ def welcome(req, res):
     #     print("Ja nao precisa exibir umas informacoes.")
     yield picoweb.start_response(res)
     yield APP.render_template(res, "base.html", (info,))
-    yield APP.render_template(res, "welcome.html", (stations,))
+    yield APP.render_template(res, "welcome.html", (stations, info,))
     yield APP.render_template(res, "end.html", ())
 
 @APP.route("/disconnect")

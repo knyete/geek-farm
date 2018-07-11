@@ -1,39 +1,22 @@
-{% args stations %}
-<div style="text-align: center">
-    <img src="/static/img/logo.jpg" width="100">
-</div>
-<form name="frmselect" method="post">
-    <table cellpadding='4' border='1' frame='box' rules='all'>
-        <TR>
-            <TD>Select SSID: <select name='ssid'>
-            {% for wifi in stations %}
-            <option value="{{wifi['ssid']}}">{{wifi['ssid']}}</option>
-            {% endfor %}
-            </select>
-        <TR>
-            <TD>Password for Secured SSID: <input type='password' name='password' maxlength='30' value=''>
-        <TR>
-            <input class="button link" type='submit' value='Conectar'>
-    </table>
-</form>
-<BR>
-<B><U>Available SSID's:</U></B>
-<BR>
-<table cellpadding='4' border='1' frame='box' rules='all'>
-    <TR>
-    <TH>SSID
-    <TH>Channel
-    <TH>Strength
-    <TH>Security
-    <TH>Visible
-    </TR>
+{% args stations, info %}
+<div class="welcome">
+<div class="wifi">
+<img src="static/img/logo.jpg">
+<h1>Select Wifi</h1>
+<form action="." method="post">
+    <select name="ssid" class="inputs">
     {% for wifi in stations %}
-        <TR>
-            <TD>{{wifi['ssid']}}</TD>
-            <TD>{{wifi['channel']}}</TD>
-            <TD>{{wifi['signal']}} db</TD>
-            <TD>{{wifi['security']}}</TD>
-            <TD>{{wifi['hidden']}}</TD>
-        </TR>
+    <option value="{{wifi['ssid']}}">{{wifi['ssid']}}</option>
     {% endfor %}
-</table>
+    </select>
+    <input type="password" class="inputs" name="password" placeholder="Password AP">
+    <p>Choose admin password to access</p>
+    <input type="password" class="inputs" name="admin_password" placeholder="Password Admin">
+
+    <button type="submit" name="submit" value="submit">Save</button>
+</form>
+</div>
+<div class="wifi-footer">
+<p><small>GeekFarm v{{info['version']}} - {{info['platform']}}</small></p>
+</div>
+</div>
